@@ -228,16 +228,15 @@ public class gui extends JFrame{
     }
     void del_day(){
         int t = JOptionPane.showConfirmDialog(this, "本当に消してもいいですか？", "警告", JOptionPane.YES_NO_OPTION);
-        if (t == JOptionPane.NO_OPTION) {
-            return;
+        if (t == JOptionPane.YES_OPTION) {
+            Date day_ = calendar.getDate();
+            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+            String day = format.format(day_);
+            Exec = new exec();
+            Exec.del_day(day);
+            load_all_table();
+            load_sel_table(day);
         }
-        Date day_ = calendar.getDate();
-        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
-        String day = format.format(day_);
-        Exec = new exec();
-        Exec.del_day(day);
-        load_all_table();
-        load_sel_table(day);
     }
     void create_db(){
         File file = new File("book");
