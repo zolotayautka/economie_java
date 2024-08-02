@@ -4,13 +4,12 @@ import java.awt.*;
 import java.awt.event.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Vector;
 import javax.swing.*;
-import javax.swing.event.*;
 import javax.swing.table.DefaultTableModel;
-
 import economie_exec.*;
 import com.toedter.calendar.JCalendar;
 
@@ -26,7 +25,7 @@ public class gui extends JFrame{
     private final ImageIcon icon0 = new ImageIcon(getClass().getResource("/add.png"));
     private final ImageIcon icon1 = new ImageIcon(getClass().getResource("/del.png"));
     public gui() {
-        //create_db();
+        create_db();
         initComponents();
     }
     private void initComponents() {
@@ -40,7 +39,7 @@ public class gui extends JFrame{
         panel1_1 = new JPanel(new BorderLayout());
         calendar = new JCalendar();
         calendar.setPreferredSize(new Dimension(400, 300));
-        calendar.setMinimumSize(new Dimension(400, 300)); // Set minimum size
+        calendar.setMinimumSize(new Dimension(400, 300));
         calendar.setMaximumSize(new Dimension(400, 300));
         calendar.addPropertyChangeListener("calendar", new PropertyChangeListener() {
             @Override
@@ -55,31 +54,27 @@ public class gui extends JFrame{
         panel1.add(panel1_1, gbc);
         gbc.gridx = 1;
         gbc.gridy = 0;
-        //
         panel1_2_1 = new JPanel(new GridBagLayout());
         del_btn = new JButton(icon1);
+        del_btn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                del_day();
+            }
+        });
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
         String day = format.format(new Date());
         load_sel_table(day);
-
-        panel1_2_2 = new JPanel(new BorderLayout());
-
-        // 임시
-        JCalendar calendar2 = new JCalendar();
-        calendar2.setPreferredSize(new Dimension(400, 300));
-        calendar2.setMinimumSize(new Dimension(400, 300)); // Set minimum size
-        calendar2.setMaximumSize(new Dimension(400, 300));
-        panel1_2_2.add(calendar2);
-        //
-
+        panel1_2_2 = new JPanel(new GridBagLayout());
+        add_panel();
         JTabbedPane tabbedPane1 = new JTabbedPane();
         tabbedPane1.addTab("日別の内訳", panel1_2_1);
         tabbedPane1.addTab("内訳入力", panel1_2_2);
-
-
-        JPanel panel1_2 = new JPanel(new BorderLayout());
+        tabbedPane1.setPreferredSize(new Dimension(400, 300));
+        tabbedPane1.setMinimumSize(new Dimension(400, 300));
+        tabbedPane1.setMaximumSize(new Dimension(400, 300));
+        panel1_2 = new JPanel(new BorderLayout());
         panel1_2.add(tabbedPane1, BorderLayout.CENTER);
-        //
         panel1.add(panel1_2, gbc);
         panel2 = new JPanel(new BorderLayout());
         load_all_table();
@@ -151,7 +146,6 @@ public class gui extends JFrame{
         gbc.fill = GridBagConstraints.NONE;
         gbc.weightx = 0.0;
         gbc.weighty = 0.0;
-        // del_btn
         stv.add(del_btn, gbc);
         nv = new JTextArea(5, 20);
         for (int i = 0; i < l; i++){
@@ -160,7 +154,6 @@ public class gui extends JFrame{
             } else {
                 nv.append(sel_list.get(l - 1 - i).naiyou + "\n");
             }
-
         }
         gbc.gridx = 0;
         gbc.gridy = 1;
@@ -172,5 +165,85 @@ public class gui extends JFrame{
         stv.revalidate();
         panel1_2_1.add(stv, gbc);
         panel1_2_1.revalidate();
+    }
+    private void add_panel(){
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(5, 5, 5, 5);
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.anchor = GridBagConstraints.EAST;
+        panel1_2_2.add(new JLabel("日付:"), gbc);
+        gbc.gridx = 1;
+        gbc.anchor = GridBagConstraints.WEST;
+        JSpinner nd = new JSpinner(new SpinnerDateModel());
+        JSpinner.DateEditor de = new JSpinner.DateEditor(nd, "yyyy.MM.dd");
+        nd.setEditor(de);
+        panel1_2_2.add(nd, gbc);
+        gbc.gridx = 2;
+        gbc.anchor = GridBagConstraints.WEST;
+        add_btn = new JButton(icon0);
+        panel1_2_2.add(add_btn, gbc);
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        gbc.anchor = GridBagConstraints.EAST;
+        panel1_2_2.add(new JLabel("内容:"), gbc);
+        gbc.gridx = 1;
+        gbc.gridwidth = 2;
+        gbc.anchor = GridBagConstraints.WEST;
+        JTextField nn = new JTextField(20);
+        panel1_2_2.add(nn, gbc);
+        gbc.gridx = 0;
+        gbc.gridy = 2;
+        gbc.gridwidth = 1;
+        gbc.anchor = GridBagConstraints.EAST;
+        panel1_2_2.add(new JLabel("金額:"), gbc);
+        gbc.gridx = 1;
+        gbc.gridwidth = 2;
+        gbc.anchor = GridBagConstraints.WEST;
+        JPanel na = new JPanel(new BorderLayout());
+        JSpinner as = new JSpinner(new SpinnerNumberModel(0, Integer.MIN_VALUE, Integer.MAX_VALUE, 1));
+        na.add(as, BorderLayout.CENTER);
+        na.add(new JLabel("¥"), BorderLayout.EAST);
+        panel1_2_2.add(na, gbc);
+        add_btn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+                String day = format.format(nd.getValue());
+                cb tuple = new cb();
+                tuple.day = day;
+                tuple.naiyou = nn.getText();
+                tuple.atai = (int) as.getValue();
+                if (tuple.atai < 0){
+                    tuple.nsf = "支出";
+                } else {
+                    tuple.nsf = "収入";
+                }
+                Exec = new exec();
+                Exec.insert_day(tuple);
+                load_all_table();
+                load_sel_table(tuple.day);
+            }
+        });
+    }
+    void del_day(){
+        int t = JOptionPane.showConfirmDialog(this, "本当に消してもいいですか？", "警告", JOptionPane.YES_NO_OPTION);
+        if (t == JOptionPane.NO_OPTION) {
+            return;
+        }
+        Date day_ = calendar.getDate();
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+        String day = format.format(day_);
+        Exec = new exec();
+        Exec.del_day(day);
+        load_all_table();
+        load_sel_table(day);
+    }
+    void create_db(){
+        File file = new File("book");
+        if (!file.exists()) {
+            Exec = new exec();
+            Exec.create_book();
+        }
     }
 }

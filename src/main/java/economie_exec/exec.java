@@ -117,7 +117,7 @@ public class exec {
     public void create_book(){
         PreparedStatement pstmt = null;
         try {
-            conn = DriverManager.getConnection("jdbc:sqlite:dic.db");
+            conn = DriverManager.getConnection("jdbc:sqlite:book");
             String sql = "CREATE TABLE chobo (" +
                     "day CHAR(20), " +
                     "nsf CHAR(20), " +
