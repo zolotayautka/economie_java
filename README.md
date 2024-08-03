@@ -1,7 +1,6 @@
 # Economie java
 
-![1](https://github.com/user-attachments/assets/639b170e-4b05-499f-ba5a-9e3d74adbbc0)
-![2](https://github.com/user-attachments/assets/a0e1a9e4-4bb3-4a4c-85d8-46f0517d9a7f)
-![3](https://github.com/user-attachments/assets/77e25ed9-aeb7-43ec-b695-038a99095ac2)
-![4](https://github.com/user-attachments/assets/993529d6-06c7-454b-b5c2-89c330e1b189)
-
+![1](https://github.com/user-attachments/assets/5f8ffc45-d45c-439e-89ab-f126099b8696)
+![2](https://github.com/user-attachments/assets/ddbda1e8-df36-4e23-82b4-5af11f743bb2)
+![3](https://github.com/user-attachments/assets/1d4af651-f1c7-4f14-b97a-9ba28f767c3c)
+![4](https://github.com/user-attachments/assets/0b68e915-9851-44fe-870f-b10e27086653)
