@@ -178,6 +178,9 @@ public class gui extends JFrame{
         JSpinner nd = new JSpinner(new SpinnerDateModel());
         JSpinner.DateEditor de = new JSpinner.DateEditor(nd, "yyyy.MM.dd");
         nd.setEditor(de);
+        Dimension w1 = nd.getPreferredSize();
+        w1.width = 162;
+        nd.setPreferredSize(w1);
         panel1_2_2.add(nd, gbc);
         gbc.gridx = 2;
         gbc.anchor = GridBagConstraints.WEST;
@@ -202,6 +205,9 @@ public class gui extends JFrame{
         gbc.anchor = GridBagConstraints.WEST;
         JPanel na = new JPanel(new BorderLayout());
         JSpinner as = new JSpinner(new SpinnerNumberModel(0, Integer.MIN_VALUE, Integer.MAX_VALUE, 1));
+        Dimension w2 = nd.getPreferredSize();
+        w2.width = 215;
+        as.setPreferredSize(w2);
         na.add(as, BorderLayout.CENTER);
         na.add(new JLabel("¥"), BorderLayout.EAST);
         panel1_2_2.add(na, gbc);
@@ -227,6 +233,9 @@ public class gui extends JFrame{
         });
     }
     void del_day(){
+        if (sel_table.getRowCount() == 0){
+            return;
+        }
         int t = JOptionPane.showConfirmDialog(this, "本当に消してもいいですか？", "警告", JOptionPane.YES_NO_OPTION);
         if (t == JOptionPane.YES_OPTION) {
             Date day_ = calendar.getDate();
