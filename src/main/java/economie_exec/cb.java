@@ -1,7 +1,7 @@
 package economie_exec;
 
 public class cb {
-    public String day;
+    public int day;
     public String nsf;
     public String naiyou;
     public int atai;
