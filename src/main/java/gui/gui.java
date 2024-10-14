@@ -10,6 +10,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Vector;
 import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.table.DefaultTableModel;
 import economie_exec.*;
 import com.toedter.calendar.JCalendar;
@@ -23,6 +25,7 @@ public class gui extends JFrame{
     private JCalendar calendar;
     private JTabbedPane tabbedPane1;
     private JTextArea nv;
+    JSpinner kr, md;
     private final ImageIcon icon0 = new ImageIcon(getClass().getResource("/add.png"));
     private final ImageIcon icon1 = new ImageIcon(getClass().getResource("/del.png"));
     private final ImageIcon icon2 = new ImageIcon(getClass().getResource("/import.png"));
@@ -42,9 +45,9 @@ public class gui extends JFrame{
         gbc.gridy = 0;
         panel1_1 = new JPanel(new BorderLayout());
         calendar = new JCalendar();
-        calendar.setPreferredSize(new Dimension(400, 300));
-        calendar.setMinimumSize(new Dimension(400, 300));
-        calendar.setMaximumSize(new Dimension(400, 300));
+        calendar.setPreferredSize(new Dimension(400, 310));
+        calendar.setMinimumSize(new Dimension(400, 310));
+        calendar.setMaximumSize(new Dimension(400, 310));
         calendar.addPropertyChangeListener("calendar", new PropertyChangeListener() {
             @Override
             public void propertyChange(PropertyChangeEvent evt) {
@@ -66,6 +69,9 @@ public class gui extends JFrame{
                 del_day();
             }
         });
+        modify_btn = new JButton(icon4);
+        //
+        //
         SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd");
         String day = format.format(new Date());
         load_sel_table(day);
@@ -74,9 +80,9 @@ public class gui extends JFrame{
         JTabbedPane tabbedPane1 = new JTabbedPane();
         tabbedPane1.addTab("日別の内訳", panel1_2_1);
         tabbedPane1.addTab("内訳入力", panel1_2_2);
-        tabbedPane1.setPreferredSize(new Dimension(400, 300));
-        tabbedPane1.setMinimumSize(new Dimension(400, 300));
-        tabbedPane1.setMaximumSize(new Dimension(400, 300));
+        tabbedPane1.setPreferredSize(new Dimension(400, 310));
+        tabbedPane1.setMinimumSize(new Dimension(400, 310));
+        tabbedPane1.setMaximumSize(new Dimension(400, 310));
         panel1_2 = new JPanel(new BorderLayout());
         panel1_2.add(tabbedPane1, BorderLayout.CENTER);
         panel1.add(panel1_2, gbc);
@@ -90,15 +96,37 @@ public class gui extends JFrame{
         dd.set(2000, Calendar.JANUARY, 1, 0, 0, 0);
         Date dd_ = dd.getTime();
         SpinnerDateModel dd__ = new SpinnerDateModel(dd_, null, null, Calendar.DAY_OF_MONTH);
-        JSpinner kr = new JSpinner(dd__);
+        kr = new JSpinner(dd__);
         JSpinner.DateEditor de1 = new JSpinner.DateEditor(kr, "yyyy.MM.dd");
         kr.setEditor(de1);
         sagasu_bar.add(kr, gbc);
         gbc.gridx = 1;
-        JSpinner md = new JSpinner(new SpinnerDateModel());
+        md = new JSpinner(new SpinnerDateModel());
         JSpinner.DateEditor de2 = new JSpinner.DateEditor(md, "yyyy.MM.dd");
         md.setEditor(de2);
         sagasu_bar.add(md, gbc);
+        //
+        kr.addChangeListener(new ChangeListener() {
+            @Override
+            public void stateChanged(ChangeEvent e) {
+                Date kr_ = (Date)kr.getValue();
+                Date md_ = (Date)md.getValue();
+                if (kr_.after(md_))
+                    md.setValue(kr_);
+                sagasu();
+            }
+        });
+        md.addChangeListener(new ChangeListener() {
+            @Override
+            public void stateChanged(ChangeEvent e) {
+                Date kr_ = (Date)kr.getValue();
+                Date md_ = (Date)md.getValue();
+                if (md_.before(kr_))
+                    kr.setValue(md_);
+                sagasu();
+            }
+        });
+        //
         gbc.gridx = 2;
         sagasu_bar.add(new JPanel(), gbc);
         gbc.gridx = 3;
@@ -127,7 +155,7 @@ public class gui extends JFrame{
         panel2_.add(sagasu_bar, BorderLayout.NORTH);
         panel2_.add(panel2, BorderLayout.CENTER);
         add(panel2_);
-        setSize(830, 640);
+        setSize(830, 660);
         setResizable(false);
         setLocationRelativeTo(null);
         setVisible(true);
@@ -192,7 +220,11 @@ public class gui extends JFrame{
         gbc.fill = GridBagConstraints.NONE;
         gbc.weightx = 0.0;
         gbc.weighty = 0.0;
-        stv.add(del_btn, gbc);
+        JPanel t_ = new JPanel(new BorderLayout());
+        t_.add(modify_btn, BorderLayout.NORTH);
+        t_.add(new JPanel(), BorderLayout.CENTER);
+        t_.add(del_btn, BorderLayout.SOUTH);
+        stv.add(t_, gbc);
         nv = new JTextArea(5, 20);
         for (int i = 0; i < l; i++){
             if ((i+1)==l) {
@@ -293,6 +325,11 @@ public class gui extends JFrame{
             load_all_table(0, 99999999);
             load_sel_table(day);
         }
+    }
+    void sagasu(){
+        SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd");
+        load_all_table(Integer.parseInt(format.format((Date)kr.getValue())), Integer.parseInt(format.format((Date)md.getValue())));
+        panel2.revalidate();
     }
     void create_db(){
         File file = new File("book");
