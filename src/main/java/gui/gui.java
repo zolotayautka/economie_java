@@ -23,9 +23,9 @@ public class gui extends JFrame{
     private exec Exec;
     private Vector<cb> all_list, sel_list;
     private JCalendar calendar;
-    private JTabbedPane tabbedPane1;
+    private JTabbedPane tabbedPane;
     private JTextArea nv;
-    JSpinner kr, md;
+    private JSpinner kr, md;
     private final ImageIcon icon0 = new ImageIcon(getClass().getResource("/add.png"));
     private final ImageIcon icon1 = new ImageIcon(getClass().getResource("/del.png"));
     private final ImageIcon icon2 = new ImageIcon(getClass().getResource("/import.png"));
@@ -38,6 +38,7 @@ public class gui extends JFrame{
     private void initComponents() {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setTitle("Economie");
+        setIconImage(new ImageIcon(getClass().getResource("/icon.png")).getImage());
         panel1 = new JPanel(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(5, 5, 5, 5);
@@ -70,25 +71,28 @@ public class gui extends JFrame{
             }
         });
         modify_btn = new JButton(icon4);
-        //
-        //
+        modify_btn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                modify();
+            }
+        });
         SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd");
         String day = format.format(new Date());
         load_sel_table(day);
         panel1_2_2 = new JPanel(new GridBagLayout());
         add_panel();
-        JTabbedPane tabbedPane1 = new JTabbedPane();
-        tabbedPane1.addTab("日別の内訳", panel1_2_1);
-        tabbedPane1.addTab("内訳入力", panel1_2_2);
-        tabbedPane1.setPreferredSize(new Dimension(400, 310));
-        tabbedPane1.setMinimumSize(new Dimension(400, 310));
-        tabbedPane1.setMaximumSize(new Dimension(400, 310));
+        tabbedPane = new JTabbedPane();
+        tabbedPane.addTab("日別の内訳", panel1_2_1);
+        tabbedPane.addTab("内訳入力", panel1_2_2);
+        tabbedPane.setPreferredSize(new Dimension(400, 310));
+        tabbedPane.setMinimumSize(new Dimension(400, 310));
+        tabbedPane.setMaximumSize(new Dimension(400, 310));
         panel1_2 = new JPanel(new BorderLayout());
-        panel1_2.add(tabbedPane1, BorderLayout.CENTER);
+        panel1_2.add(tabbedPane, BorderLayout.CENTER);
         panel1.add(panel1_2, gbc);
         panel2 = new JPanel(new BorderLayout());
         load_all_table(0, 99999999);
-        //
         sagasu_bar = new JPanel(new GridLayout());
         gbc.gridx = 0;
         gbc.gridy = 0;
@@ -105,7 +109,6 @@ public class gui extends JFrame{
         JSpinner.DateEditor de2 = new JSpinner.DateEditor(md, "yyyy.MM.dd");
         md.setEditor(de2);
         sagasu_bar.add(md, gbc);
-        //
         kr.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {
@@ -126,7 +129,6 @@ public class gui extends JFrame{
                 sagasu();
             }
         });
-        //
         gbc.gridx = 2;
         sagasu_bar.add(new JPanel(), gbc);
         gbc.gridx = 3;
@@ -147,8 +149,6 @@ public class gui extends JFrame{
             }
         });
         sagasu_bar.add(out_btn, gbc);
-
-        //
         setLayout(new GridLayout(2, 1));
         add(panel1);
         panel2_ = new JPanel(new BorderLayout());
@@ -311,7 +311,38 @@ public class gui extends JFrame{
             }
         });
     }
-    void del_day(){
+    private void modify(){
+        int l = sel_table.getRowCount();
+        if (l > 0){
+            SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd");
+            String day = format.format(calendar.getDate());
+            Vector<cb> in = new Vector<cb>();
+            String[] line = nv.getText().split("\n");
+            for(int i = 0; i < l; i++){
+                cb t_ = new cb();
+                t_.day = Integer.parseInt(day);
+                String t = (String)sel_table.getValueAt(i, 2);
+                if (!t.endsWith("¥")){
+                    return;
+                }
+                t_.atai = Integer.parseInt(t.substring(0, t.length() - 2));
+                t_.naiyou = line[i];
+                if (t_.atai < 0){
+                    t_.nsf = "支出";
+                } else {
+                    t_.nsf = "収入";
+                }
+                in.add(t_);
+            }
+            Exec.del_day(day);
+            Exec = new exec();
+            for (int i = 0; i < l; i++)
+                Exec.insert_day(in.get(l-1-i));
+            sagasu();
+            panel2.revalidate();
+        }
+    }
+    private void del_day(){
         if (sel_table.getRowCount() == 0){
             return;
         }
@@ -326,12 +357,12 @@ public class gui extends JFrame{
             load_sel_table(day);
         }
     }
-    void sagasu(){
+    private void sagasu(){
         SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd");
         load_all_table(Integer.parseInt(format.format((Date)kr.getValue())), Integer.parseInt(format.format((Date)md.getValue())));
         panel2.revalidate();
     }
-    void create_db(){
+    private void create_db(){
         File file = new File("book");
         if (!file.exists()) {
             Exec = new exec();
@@ -339,17 +370,24 @@ public class gui extends JFrame{
         }
     }
     private void import_csv(){
+        int q = JOptionPane.showConfirmDialog(this, "既存の内訳を削除しますか？", "お知らせ", JOptionPane.YES_NO_OPTION);
         JFileChooser fd = new JFileChooser();
         int t = fd.showOpenDialog(null);
         if (t == JFileChooser.APPROVE_OPTION) {
             File file = fd.getSelectedFile();
+            if (q == JOptionPane.YES_OPTION) {
+                File f = new File("book");
+                if (f.exists())
+                    f.delete();
+                create_db();
+            }
             Exec = new exec();
             Exec.import_(file.getAbsolutePath());
             load_all_table(0, 99999999);
             panel2.revalidate();
         }
     }
-    void out_csv(){
+    private void out_csv(){
         JFileChooser fd = new JFileChooser();
         int t = fd.showSaveDialog(null);
         if (t == JFileChooser.APPROVE_OPTION) {
