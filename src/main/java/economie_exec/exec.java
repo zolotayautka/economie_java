@@ -14,7 +14,7 @@ public class exec {
         all_list = new Vector<cb>();
         PreparedStatement pstmt = null;
         try {
-            conn = DriverManager.getConnection("jdbc:sqlite:book");
+            conn = DriverManager.getConnection("jdbc:sqlite:.book");
             String sql = "SELECT day, nsf, naiyou, atai FROM chobo WHERE day >= ? AND day <= ? ORDER BY day ASC;";
             pstmt = conn.prepareStatement(sql);
             pstmt.setString(1, String.valueOf(kara));
@@ -45,7 +45,7 @@ public class exec {
         sel_list = new Vector<cb>();
         PreparedStatement pstmt = null;
         try{
-            conn = DriverManager.getConnection("jdbc:sqlite:book");
+            conn = DriverManager.getConnection("jdbc:sqlite:.book");
             String sql = "SELECT day, nsf, naiyou, atai FROM chobo WHERE day=?;";
             pstmt = conn.prepareStatement(sql);
             pstmt.setString(1, String.valueOf(day));
@@ -74,7 +74,7 @@ public class exec {
     public void insert_day(cb in){
         PreparedStatement pstmt = null;
         try {
-            conn = DriverManager.getConnection("jdbc:sqlite:book");
+            conn = DriverManager.getConnection("jdbc:sqlite:.book");
             String sql = "INSERT INTO chobo VALUES (?, ?, ?, ?);";
             pstmt = conn.prepareStatement(sql);
             pstmt.setString(1, String.valueOf(in.day));
@@ -97,7 +97,7 @@ public class exec {
     public void del_day(String day){
         PreparedStatement pstmt = null;
         try {
-            conn = DriverManager.getConnection("jdbc:sqlite:book");
+            conn = DriverManager.getConnection("jdbc:sqlite:.book");
             String sql = "DELETE FROM chobo WHERE day=?;";
             pstmt = conn.prepareStatement(sql);
             pstmt.setString(1, day);
@@ -180,7 +180,7 @@ public class exec {
     public void create_book(){
         PreparedStatement pstmt = null;
         try {
-            conn = DriverManager.getConnection("jdbc:sqlite:book");
+            conn = DriverManager.getConnection("jdbc:sqlite:.book");
             String sql = "CREATE TABLE chobo (" +
                     "day INT, " +
                     "nsf CHAR(20), " +
