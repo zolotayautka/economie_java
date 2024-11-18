@@ -78,8 +78,6 @@ public class gui extends JFrame{
         String day = format.format(new Date());
         load_sel_table(day);
         panel1_2_2 = new JPanel(new GridBagLayout());
-        gbc.gridx = 0;
-        gbc.gridy = 0;
         gbc.anchor = GridBagConstraints.EAST;
         panel1_2_2.add(new JLabel("日付:"), gbc);
         gbc.gridx = 1;
@@ -155,7 +153,6 @@ public class gui extends JFrame{
         load_all_table(0, 99999999);
         sagasu_bar = new JPanel(new GridLayout());
         gbc.gridx = 0;
-        gbc.gridy = 0;
         Calendar dd = Calendar.getInstance();
         dd.set(2000, Calendar.JANUARY, 1, 0, 0, 0);
         Date dd_ = dd.getTime();
