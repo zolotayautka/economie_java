@@ -54,14 +54,11 @@ public class gui extends JFrame{
             public void propertyChange(PropertyChangeEvent evt) {
                 Date day_ = calendar.getDate();
                 SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd");
-                String day = format.format(day_);
-                load_sel_table(day);
+                load_sel_table(format.format(day_));
             }
         });
         panel1_1.add(calendar, BorderLayout.CENTER);
         panel1.add(panel1_1, gbc);
-        gbc.gridx = 1;
-        gbc.gridy = 0;
         panel1_2_1 = new JPanel(new GridBagLayout());
         del_btn = new JButton(icon1);
         del_btn.addActionListener(new ActionListener() {
@@ -81,7 +78,68 @@ public class gui extends JFrame{
         String day = format.format(new Date());
         load_sel_table(day);
         panel1_2_2 = new JPanel(new GridBagLayout());
-        add_panel();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.anchor = GridBagConstraints.EAST;
+        panel1_2_2.add(new JLabel("日付:"), gbc);
+        gbc.gridx = 1;
+        gbc.anchor = GridBagConstraints.WEST;
+        JSpinner nd = new JSpinner(new SpinnerDateModel());
+        JSpinner.DateEditor de = new JSpinner.DateEditor(nd, "yyyy.MM.dd");
+        nd.setEditor(de);
+        Dimension w = nd.getPreferredSize();
+        w.width = 162;
+        nd.setPreferredSize(w);
+        panel1_2_2.add(nd, gbc);
+        gbc.gridx = 2;
+        gbc.anchor = GridBagConstraints.WEST;
+        add_btn = new JButton(icon0);
+        panel1_2_2.add(add_btn, gbc);
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        gbc.anchor = GridBagConstraints.EAST;
+        panel1_2_2.add(new JLabel("内容:"), gbc);
+        gbc.gridx = 1;
+        gbc.gridwidth = 2;
+        gbc.anchor = GridBagConstraints.WEST;
+        JTextField nn = new JTextField(20);
+        panel1_2_2.add(nn, gbc);
+        gbc.gridx = 0;
+        gbc.gridy = 2;
+        gbc.gridwidth = 1;
+        gbc.anchor = GridBagConstraints.EAST;
+        panel1_2_2.add(new JLabel("金額:"), gbc);
+        gbc.gridx = 1;
+        gbc.gridwidth = 2;
+        gbc.anchor = GridBagConstraints.WEST;
+        JPanel na = new JPanel(new BorderLayout());
+        JSpinner as = new JSpinner(new SpinnerNumberModel(0, Integer.MIN_VALUE, Integer.MAX_VALUE, 1));
+        w.width = 215;
+        as.setPreferredSize(w);
+        na.add(as, BorderLayout.CENTER);
+        na.add(new JLabel("¥"), BorderLayout.EAST);
+        panel1_2_2.add(na, gbc);
+        add_btn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd");
+                String day = format.format(nd.getValue());
+                cb tuple = new cb();
+                tuple.day = Integer.parseInt(day);
+                tuple.naiyou = nn.getText();
+                tuple.atai = (int) as.getValue();
+                if (tuple.atai < 0){
+                    tuple.nsf = "支出";
+                } else {
+                    tuple.nsf = "収入";
+                }
+                Exec = new exec();
+                Exec.insert_day(tuple);
+                load_all_table(0, 99999999);
+                Date day_ = calendar.getDate();
+                load_sel_table(format.format(day_));
+            }
+        });
         tabbedPane = new JTabbedPane();
         tabbedPane.addTab("日別の内訳", panel1_2_1);
         tabbedPane.addTab("内訳入力", panel1_2_2);
@@ -90,6 +148,8 @@ public class gui extends JFrame{
         tabbedPane.setMaximumSize(new Dimension(400, 310));
         panel1_2 = new JPanel(new BorderLayout());
         panel1_2.add(tabbedPane, BorderLayout.CENTER);
+        gbc.gridx = 1;
+        gbc.gridy = 0;
         panel1.add(panel1_2, gbc);
         panel2 = new JPanel(new BorderLayout());
         load_all_table(0, 99999999);
@@ -247,73 +307,6 @@ public class gui extends JFrame{
         panel1_2_1.add(stv, gbc);
         panel1_2_1.revalidate();
     }
-    private void add_panel(){
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(5, 5, 5, 5);
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        gbc.anchor = GridBagConstraints.EAST;
-        panel1_2_2.add(new JLabel("日付:"), gbc);
-        gbc.gridx = 1;
-        gbc.anchor = GridBagConstraints.WEST;
-        JSpinner nd = new JSpinner(new SpinnerDateModel());
-        JSpinner.DateEditor de = new JSpinner.DateEditor(nd, "yyyy.MM.dd");
-        nd.setEditor(de);
-        Dimension w1 = nd.getPreferredSize();
-        w1.width = 162;
-        nd.setPreferredSize(w1);
-        panel1_2_2.add(nd, gbc);
-        gbc.gridx = 2;
-        gbc.anchor = GridBagConstraints.WEST;
-        add_btn = new JButton(icon0);
-        panel1_2_2.add(add_btn, gbc);
-        gbc.gridx = 0;
-        gbc.gridy = 1;
-        gbc.anchor = GridBagConstraints.EAST;
-        panel1_2_2.add(new JLabel("内容:"), gbc);
-        gbc.gridx = 1;
-        gbc.gridwidth = 2;
-        gbc.anchor = GridBagConstraints.WEST;
-        JTextField nn = new JTextField(20);
-        panel1_2_2.add(nn, gbc);
-        gbc.gridx = 0;
-        gbc.gridy = 2;
-        gbc.gridwidth = 1;
-        gbc.anchor = GridBagConstraints.EAST;
-        panel1_2_2.add(new JLabel("金額:"), gbc);
-        gbc.gridx = 1;
-        gbc.gridwidth = 2;
-        gbc.anchor = GridBagConstraints.WEST;
-        JPanel na = new JPanel(new BorderLayout());
-        JSpinner as = new JSpinner(new SpinnerNumberModel(0, Integer.MIN_VALUE, Integer.MAX_VALUE, 1));
-        Dimension w2 = nd.getPreferredSize();
-        w2.width = 215;
-        as.setPreferredSize(w2);
-        na.add(as, BorderLayout.CENTER);
-        na.add(new JLabel("¥"), BorderLayout.EAST);
-        panel1_2_2.add(na, gbc);
-        add_btn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd");
-                String day = format.format(nd.getValue());
-                cb tuple = new cb();
-                tuple.day = Integer.parseInt(day);
-                tuple.naiyou = nn.getText();
-                tuple.atai = (int) as.getValue();
-                if (tuple.atai < 0){
-                    tuple.nsf = "支出";
-                } else {
-                    tuple.nsf = "収入";
-                }
-                Exec = new exec();
-                Exec.insert_day(tuple);
-                load_all_table(0, 99999999);
-                Date day_ = calendar.getDate();
-                load_sel_table(format.format(day_));
-            }
-        });
-    }
     private void modify(){
         int l = sel_table.getRowCount();
         if (l > 0){
@@ -342,6 +335,7 @@ public class gui extends JFrame{
             for (int i = 0; i < l; i++)
                 Exec.insert_day(in.get(l-1-i));
             sagasu();
+            load_sel_table(day);
             panel2.revalidate();
         }
     }
