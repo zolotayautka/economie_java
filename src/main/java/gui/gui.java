@@ -163,9 +163,12 @@ public class gui extends JFrame{
     private void load_all_table(int kara, int made){
         Exec = new exec();
         all_list = Exec.sagasu(kara, made);
+        Vector<cb> tmp = Exec.sagasu(0, kara-1);
         String[] columns = {"日付", "入/出", "内容", "金額", "残額"};
         int l = all_list.size();
         int t = 0;
+        for (int i = 0; i < tmp.size(); i++)
+            t += tmp.get(i).atai;
         Object[][] data = new Object[l][columns.length];
          for (int i = 0; i < l; i++) {
             data[l-1-i][0] = all_list.get(i).day;
